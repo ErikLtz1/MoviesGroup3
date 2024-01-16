@@ -5,14 +5,18 @@ const searchButton = document.getElementById("searchButton");
 let watchlist = [];
 const showWatchlistButton = document.getElementById("showWatchlistButton");
 let watchlistTitles = [];
+let hideAddToList = 0;
+const home = document.getElementById("home");
 
-console.log("Hej");
 fetch("https://api.themoviedb.org/3/discover/movie?include_adult=false&include_video=false&language=en-US&page=1&sort_by=popularity.desc&api_key=88d6f906b386ac47c004701d8f545df8")
 .then(res => res.json())
 .then(data => {
     
     printMovieList(data.results);
     watchlistButtonFunction(data);
+    home.addEventListener("click", () => {
+        printMovieList(data.results);
+    })
 })
 
 function printMovieList(movies) {
@@ -49,8 +53,8 @@ function printMovieInfo(movie) {
     movieImg.width = 350;
     movieImg.src = "http://image.tmdb.org/t/p/original/" + movie.poster_path;
     
-    addMovieToList.innerText = "Add to Watchlist";
     let addMovieToList = document.createElement("button");
+    addMovieToList.innerText = "Add to Watchlist";
     
     addMovieToList.addEventListener("click", () => {
         watchlist.push(movie.id);
@@ -59,28 +63,33 @@ function printMovieInfo(movie) {
         localStorage.setItem("Watchlist", watchlistStringify);
     })
     
-    movieDiv.append(movieHeadline, addMovieToList, movieText, movieImg);
+    if (hideAddToList == 0) {
+        movieDiv.append(movieHeadline, addMovieToList, movieText, movieImg);
+    } else {
+        movieDiv.append(movieHeadline, movieText, movieImg);
+        hideAddToList = 0;
+    }
     movieInfo.appendChild(movieDiv);
 }
 
 searchButton.addEventListener("click", () => {
     
-    search = searchMovieInput.value;
-    //search = "Blade Runner" 
+    search = searchMovieInput.value; 
     fetch("https://api.themoviedb.org/3/search/movie?query="+ search +"&include_adult=false&language=en-US&page=1&api_key=88d6f906b386ac47c004701d8f545df8")
     .then(res => res.json())
     .then(data1 => {
         movieList.innerHTML = "";
         console.log(data1);
-        printMovieList(data1);
+        printMovieList(data1.results);
     })
 })
 
 
 function watchlistButtonFunction(movies) {
+    movieInfo.innerHTML = "";
+    hideAddToList = 1;
     showWatchlistButton.addEventListener("click", () => {
         watchlist = JSON.parse(localStorage.getItem("Watchlist"));
-
         for(let i = 0; i < watchlist.length; i++) {
             fetch("https://api.themoviedb.org/3/movie/"+ watchlist[i] +"?language=en-US&api_key=88d6f906b386ac47c004701d8f545df8")
             .then(res => res.json())
@@ -91,4 +100,3 @@ function watchlistButtonFunction(movies) {
         printMovieList(watchlistTitles);
     })
 }
-
