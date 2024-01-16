@@ -2,7 +2,19 @@ body {
     font-family: Arial, Helvetica, sans-serif;
     background-color: black;
     color: beige;
-    display: flex;
+    display: block;
+    flex-direction: column;
+    justify-content: center;
+    background-image: url("backgroundMovie.jpg");
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+    background-attachment: fixed;
+    color: white;
+    height: 100vh;
+    width: 98vw;
+    max-width: 98vw;
+    overflow-x: initial;
 }
 #movie {
     max-width: 200px;
@@ -27,10 +39,12 @@ button {
     box-shadow: 0px 10px 14px -7px #276873;
     text-shadow: 0px 1px 0px #3d768a;
     background:linear-gradient(#599bb3, #408c99);
+    margin-top: 10px;
   }
   
   button:hover {
     background: linear-gradient(#408c99, #599bb3);
+    cursor: pointer;
   }
 
   input {
@@ -47,4 +61,30 @@ button {
 }
 input:focus {
     outline:none;
+}
+
+#logo {
+    width: 100vw;
+    text-align: center;
+    height: fit-content;
+}
+
+#movie {
+    padding: 3px;
+}
+
+#buttonDiv {
+    display: inline;
+}
+
+#ulDiv {
+    width: 25%;
+}
+
+#movieInfo {
+    width: 70%;
+}
+
+li {
+    cursor: pointer;
 }
