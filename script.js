@@ -12,6 +12,7 @@ const reviewsList = document.getElementById("reviewsList");
 const recommendationsUl = document.getElementById("recommendations");
 const recommendationsTitleDiv = document.getElementById("recommendationsTitleDiv");
 const reviewsTitleDiv = document.getElementById("reviewsTitleDiv");
+localStorage.setItem("Watchlist", "");
 
 
 fetch("https://api.themoviedb.org/3/discover/movie?include_adult=false&include_video=false&language=en-US&page=1&sort_by=popularity.desc&api_key=88d6f906b386ac47c004701d8f545df8")
@@ -66,11 +67,16 @@ function printMovieInfo(movie) {
     addMovieToList.innerText = "Add to Watchlist";
     
     addMovieToList.addEventListener("click", () => {
-        watchlist.push(movie.id);
-        console.log(watchlist);
-        let watchlistStringify = JSON.stringify(watchlist);
-        localStorage.setItem("Watchlist", watchlistStringify);
-    })
+
+        if (!watchlist.includes(movie.id)) {
+            watchlist.push(movie.id);
+            let watchlistStringify = JSON.stringify(watchlist);
+            localStorage.setItem("Watchlist", watchlistStringify);
+            alert("This movie has been added to your watchlist!")
+        } else {
+            alert("This movie is already in your watchlist");
+        }
+        })
 
     let seeMovieReviews = document.createElement("button");
     seeMovieReviews.innerText = "See Reviews";
@@ -108,7 +114,6 @@ function printMovieInfo(movie) {
 
         })
     })
-
 
     let seeMovieRecommendations = document.createElement("button");
     seeMovieRecommendations.innerText = "See other recommendations";
@@ -160,14 +165,16 @@ function printMovieInfo(movie) {
 searchButton.addEventListener("click", () => {
     
     search = searchMovieInput.value; 
-    fetch("https://api.themoviedb.org/3/search/movie?query="+ search +"&include_adult=false&language=en-US&page=1&api_key=88d6f906b386ac47c004701d8f545df8")
-    .then(res => res.json())
-    .then(data1 => {
-        movieList.innerHTML = "";
-        console.log(data1);
-        printMovieList(data1.results);
-    })
-    searchMovieInput.value = "";
+    if (search != "") {
+        fetch("https://api.themoviedb.org/3/search/movie?query="+ search +"&include_adult=false&language=en-US&page=1&api_key=88d6f906b386ac47c004701d8f545df8")
+        .then(res => res.json())
+        .then(data1 => {
+            movieList.innerHTML = "";
+            console.log(data1);
+            printMovieList(data1.results);
+        })
+        searchMovieInput.value = "";
+    }
 })
 
 
@@ -176,17 +183,22 @@ function watchlistButtonFunction(movies) {
     showWatchlistButton.addEventListener("click", async () => {
         //movieList.innerHTML = "";
         movieInfo.innerHTML = "";
-        watchlist = JSON.parse(localStorage.getItem("Watchlist"));
-        watchlistTitles = [];
-        for(let i = 0; i < watchlist.length; i++) {
-            const response = await fetch("https://api.themoviedb.org/3/movie/"+ watchlist[i] +"?language=en-US&api_key=88d6f906b386ac47c004701d8f545df8")
-            .then(res => res.json())
-            .then(data2 => {
-                watchlistTitles.push(data2)
-                showWatchlist.innerHTML = "";
-            })
+        try {
+            watchlist = JSON.parse(localStorage.getItem("Watchlist"));
+            watchlistTitles = [];
+            for(let i = 0; i < watchlist.length; i++) {
+                const response = await fetch("https://api.themoviedb.org/3/movie/"+ watchlist[i] +"?language=en-US&api_key=88d6f906b386ac47c004701d8f545df8")
+                .then(res => res.json())
+                .then(data2 => {
+                    watchlistTitles.push(data2)
+                    showWatchlist.innerHTML = "";
+                })
+            }
+            printMovieList(watchlistTitles);
+
+        } catch {
+            alert("There are no films in the watchlist");
         }
-        printMovieList(watchlistTitles);
         
     })
 
